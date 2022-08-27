@@ -201,7 +201,6 @@ export default function World(scene, renderDistance, seed) {
 		};
 
 		this.getBlock = (x, y, z) => {
-			console.log([x,y,z]);
 			return this.voxels.getCell(x, y, z);
 		};
 

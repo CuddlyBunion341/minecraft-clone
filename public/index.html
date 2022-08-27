@@ -42,21 +42,11 @@
             background-size: cover;
         }
     </style>
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "./node_modules/three/build/three.module.js",
-                "OrbitControls":"./node_modules/three/examples/jsm/controls/OrbitControls.js",
-                "FirstPersonControls":"./node_modules/three/examples/jsm/controls/FirstPersonControls.js",
-                "FlyControls":"./node_modules/three/examples/jsm/controls/FlyControls.js"
-            }
-        }
-    </script>
     <link rel="icon" href="images/favicon.ico" type="image/x-icon">
 </head>
 <body>
     <img src="./images/gui/slotSelected.png" style="display: none;">
-    <script type="module" defer src="./src/main.js"></script>
+    <script type="module" defer src="./bundle.js"></script>
     <canvas id="c">Your Browser sucks!</canvas>
     <div id="hud">
         <div id="hotbar"></div>

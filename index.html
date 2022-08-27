@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Minecraft Clone</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        #hud {
+            position: fixed;
+            width: 100%;
+        }
+        #hotbar {
+            width: 50%;
+            position: fixed;
+            width: 900px;
+            height: 100px;
+            bottom: 10px;
+            left: calc(50% - 900px / 2);
+        }
+        .slot {
+            width: 11.11%;
+            height: 100%;
+            float: left;
+            background-image: url("images/gui/slot.png");
+            background-size: cover;
+            image-rendering: pixelated;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .slot.selected {
+            background-image: url("images/gui/slotSelected.png");
+            transform: scale(1.1,1.1) translate(-0.05,-0.05);
+        }
+        .slot img {
+            width: 70%;
+            height: 70%;
+            background-size: cover;
+        }
+    </style>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "./node_modules/three/build/three.module.js",
+                "OrbitControls":"./node_modules/three/examples/jsm/controls/OrbitControls.js",
+                "FirstPersonControls":"./node_modules/three/examples/jsm/controls/FirstPersonControls.js",
+                "FlyControls":"./node_modules/three/examples/jsm/controls/FlyControls.js"
+            }
+        }
+    </script>
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <img src="./images/gui/slotSelected.png" style="display: none;">
+    <script type="module" defer src="./src/main.js"></script>
+    <canvas id="c">Your Browser sucks!</canvas>
+    <div id="hud">
+        <div id="hotbar"></div>
+    </div>
+</body>
+</html>

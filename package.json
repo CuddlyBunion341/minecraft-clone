@@ -1,0 +1,16 @@
+{
+  "name": "minecraft-clone",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Daniel Bengl",
+  "license": "MIT",
+  "dependencies": {
+    "enable3d": "^0.25.2",
+    "stats.js": "^0.17.0",
+    "three": "^0.138.3"
+  }
+}

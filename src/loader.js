@@ -2,7 +2,7 @@ import { TextureLoader, NearestFilter, LinearFilter } from "three";
 
 /* This is creating a new TextureLoader object, and setting the path to the images folder. */
 const loader = new TextureLoader();
-loader.setPath("/images/");
+loader.setPath("images/");
 
 /**
  * Loads a texture from a file and sets the min and mag filters to NearestFilter

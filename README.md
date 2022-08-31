@@ -1,13 +1,10 @@
-## Hello
+## Minecraft-Clone
 
-Dis is description
-
-[todo](todo.md)
+This is a simple minecraft clone with the Three.js library...
 
 
 ### Live Demo
-not deployed yet
-
+[Github Pages](https://cuddlybunion341.github.io/minecraft-clone/public/)
 
 ### Installation
 

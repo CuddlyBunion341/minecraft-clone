@@ -203,8 +203,9 @@ export const createSteveControls = (
 			Math.floor(camera.position.z / 16)
 		);
 
-		if (!(newChunkPos.x == chunkPos.x && newChunkPos.y == chunkPos.y))
+		if (!(newChunkPos.x == chunkPos.x && newChunkPos.y == chunkPos.y)) {
 			onChunkChange(chunkPos, newChunkPos);
+		}
 		chunkPos.copy(newChunkPos);
 	};
 
@@ -215,12 +216,16 @@ export const createSteveControls = (
 
 		const v = new Vector3(0, 0, 0);
 
-		if (pressedKeys["KeyW"]) v.x += 10 * delta;
-		if (pressedKeys["KeyS"]) v.x -= 10 * delta;
-		if (pressedKeys["KeyD"]) v.z += 10 * delta;
-		if (pressedKeys["KeyA"]) v.z -= 10 * delta;
-		if (pressedKeys["Space"]) v.y += 10 * delta;
-		if (pressedKeys["ShiftLeft"]) v.y -= 10 * delta;
+		let speed = 10;
+
+		if (pressedKeys["AltLeft"]) speed *= 10;
+
+		if (pressedKeys["KeyW"]) v.x += speed * delta;
+		if (pressedKeys["KeyS"]) v.x -= speed * delta;
+		if (pressedKeys["KeyD"]) v.z += speed * delta;
+		if (pressedKeys["KeyA"]) v.z -= speed * delta;
+		if (pressedKeys["Space"]) v.y += speed * delta;
+		if (pressedKeys["ShiftLeft"]) v.y -= speed * delta;
 
 		const x = controls.getObject().position.x;
 		const y = controls.getObject().position.y;
@@ -230,6 +235,16 @@ export const createSteveControls = (
 		controls.moveForward(v.x);
 		controls.moveRight(v.z);
 		controls.getObject().position.y += v.y;
+
+		const newChunkPos = new Vector2(
+			Math.floor(camera.position.x / 16),
+			Math.floor(camera.position.z / 16)
+		);
+
+		if (!(newChunkPos.x == chunkPos.x && newChunkPos.y == chunkPos.y)) {
+			onChunkChange(chunkPos, newChunkPos);
+		}
+		chunkPos.copy(newChunkPos);
 	};
 
 	return {

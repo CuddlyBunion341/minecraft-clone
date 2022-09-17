@@ -24,22 +24,23 @@ const WorldGenerator = function (seed) {
 
 		for (let x = 0; x < width; x++) {
 			for (let z = 0; z < length; z++) {
+				const waterLevel = 35;
 				const height = heightMap[x][z];
 				for (let y = 0; y < height; y++) {
-					if (y == 0) layers[y][x][z] = "bedrock";
-					else if (y >= 40) layers[y][x][z] = "stone";
-					else if (inRange(y, 0, height / 2))
-						layers[y][x][z] =
-							Math.random() <= 0.001 && y <= 12
-								? "diamond"
-								: "stone";
-					else if (y >= height - 1) layers[y][x][z] = "sand";
-					else layers[y][x][z] = "dirt";
+					const isSurface = y == height - 1;
+					let block = "dirt";
+					if (y == 0) block = "bedrock";
+					else if (isSurface && y <= waterLevel) block = "sand";
+					// else if (y >= 50) block = "stone";
+					else if (y <= height - 5) {
+						if (y <= 16 && Math.random() <= 0.01) block = "diamond";
+						else block = "stone";
+					} else if (isSurface) block = "grass";
+					layers[y][x][z] = block;
 
 					// if (y > height && y < 100) layers[y][x][z] = "glass";
 					// layers[y][x][z] = "stone";
 				}
-				const waterLevel = 40;
 				for (let y = height; y < waterLevel; y++) {
 					layers[y][x][z] = "water";
 				}

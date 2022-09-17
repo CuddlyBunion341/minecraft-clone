@@ -1,5 +1,13 @@
-import { ArrowHelper } from "three";
-import { BoxGeometry, Mesh, MeshBasicMaterial, Raycaster, Vector2, Vector3, WebGLRenderer } from "three";
+import { EffectComposer } from "enable3d";
+import {
+	BoxGeometry,
+	Mesh,
+	MeshBasicMaterial,
+	Raycaster,
+	Vector2,
+	Vector3,
+	WebGLRenderer,
+} from "three";
 import Stats from "../node_modules/stats.js/src/Stats.js";
 import { createSteveControls } from "./controls.js";
 import { createGUI } from "./gui.js";
@@ -8,11 +16,17 @@ import { camera, scene } from "./scene.js";
 import World from "./world.js";
 
 const canvas = document.querySelector("canvas#c");
-const renderer = new WebGLRenderer({ canvas, antialias: true, logarithmicDepthBuffer: true });
+const renderer = new WebGLRenderer({
+	canvas,
+	antialias: true,
+	logarithmicDepthBuffer: true,
+});
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 
-const renderDistance = 5;
+const composer = new EffectComposer(renderer);
+
+const renderDistance = 10;
 
 const world = new World(scene, renderDistance);
 
@@ -21,7 +35,12 @@ raycaster.far = 15;
 
 const outline = new Mesh(
 	new BoxGeometry(1.0001, 1.0001, 1.0001),
-	new MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.2, depthWrite: false })
+	new MeshBasicMaterial({
+		color: 0xffffff,
+		transparent: true,
+		opacity: 0.2,
+		depthWrite: false,
+	})
 );
 outline.position.y = 60;
 outline.visible = false;
@@ -54,9 +73,14 @@ const castRay = (inside = true, moveBox = false) => {
 	const intersect = raycaster.intersectObjects(world.worldGroup.children)[0];
 	if (intersect) {
 		if (!intersect.face) return;
-		const norm = intersect.face.normal.divideScalar(2).multiplyScalar(inside ? -1 : 1);
+		const norm = intersect.face.normal
+			.divideScalar(2)
+			.multiplyScalar(inside ? -1 : 1);
 		const pos = [];
-		const intersectVector = new Vector3().copy(intersect.point).add(norm).floor();
+		const intersectVector = new Vector3()
+			.copy(intersect.point)
+			.add(norm)
+			.floor();
 		intersectVector.toArray(pos);
 
 		return pos;
@@ -70,7 +94,11 @@ const controls = createSteveControls(
 	world,
 	() => placeBlock("dirt"),
 	removeBlock,
-	newChunk => setTimeout(() => world.render(newChunk.x, newChunk.y, renderDistance), 0)
+	(newChunk) =>
+		setTimeout(
+			() => world.render(newChunk.x, newChunk.y, renderDistance),
+			0
+		)
 );
 
 window.addEventListener("resize", () => {

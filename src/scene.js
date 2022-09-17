@@ -2,29 +2,42 @@ import {
 	AmbientLight,
 	AxesHelper,
 	Color,
-	DirectionalLight, Fog, Mesh, MeshBasicMaterial, NearestFilter, PerspectiveCamera, PlaneGeometry, Scene
+	DirectionalLight,
+	Fog,
+	Mesh,
+	MeshBasicMaterial,
+	NearestFilter,
+	PerspectiveCamera,
+	PlaneGeometry,
+	Scene,
 } from "three";
 import { loadImage } from "./loader.js";
 import { createEnvironment } from "./environment.js";
 
 const scene = new Scene();
 scene.background = new Color(0x86b9e3);
-const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
+const camera = new PerspectiveCamera(
+	75,
+	window.innerWidth / window.innerHeight,
+	0.1,
+	10000
+);
 const axis = new AxesHelper();
 camera.position.set(20, 60, 20);
 scene.add(camera);
 scene.add(axis);
 
-scene.fog = new Fog(0xffffff, 10, 600);
+scene.fog = new Fog(0xffffff, 10, 400);
 
-// reticle
-// const reticleMesh = new Mesh(new RingBufferGeometry(1,3),new MeshBasicMaterial({color: 0x00FF00}));
-// camera.add(reticleMesh)
-
-loadImage("gui/croshair.png", img => {
+loadImage("gui/croshair.png", (img) => {
 	img.magFilter = NearestFilter;
 	const plane = new PlaneGeometry(0.025, 0.025);
-	const mat = new MeshBasicMaterial({ map: img, depthTest: false, depthWrite: false, transparent: true });
+	const mat = new MeshBasicMaterial({
+		map: img,
+		depthTest: false,
+		depthWrite: false,
+		transparent: true,
+	});
 	const croshair = new Mesh(plane, mat);
 	croshair.renderOrder = 999;
 	croshair.position.z -= 0.5;

@@ -12,8 +12,10 @@
   "license": "MIT",
   "dependencies": {
     "enable3d": "^0.25.2",
+    "fractal-noise": "^1.2.0",
     "stats.js": "^0.17.0",
-    "three": "^0.138.3"
+    "three": "^0.138.3",
+    "three-addons": "^1.2.0"
   },
   "devDependencies": {
     "ts-loader": "^9.3.1",

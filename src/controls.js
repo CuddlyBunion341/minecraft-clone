@@ -14,7 +14,7 @@ export const createSteveControls = (
 	world,
 	place = () => {},
 	remove = () => {},
-	onChunkChange = pos => {}
+	onChunkChange = (pos) => {}
 ) => {
 	const controls = new PointerLockControls(camera, canvas);
 	canvas.addEventListener("click", () => controls.lock());
@@ -28,23 +28,26 @@ export const createSteveControls = (
 
 	let prevTime = performance.now();
 
-	document.addEventListener("keydown", e => {
+	document.addEventListener("keydown", (e) => {
 		pressedKeys[e.code] = true;
 	});
 
-	document.addEventListener("keyup", e => {
+	document.addEventListener("keyup", (e) => {
 		pressedKeys[e.code] = false;
 	});
 
-	document.addEventListener("mousedown", e => {
+	document.addEventListener("mousedown", (e) => {
 		if (e.which == 3) place();
 		if (e.which == 1) remove();
 	});
 
-	const playerBox = new Mesh(new BoxGeometry(0.5, 2, 0.5, 1,2,1), new MeshBasicMaterial({ wireframe: true }));
+	const playerBox = new Mesh(
+		new BoxGeometry(0.5, 2, 0.5, 1, 2, 1),
+		new MeshBasicMaterial({ wireframe: true })
+	);
 	// scene.add(playerBox);
 
-	const update = () => {
+	const update1 = () => {
 		const time = performance.now();
 		const delta = (time - prevTime) / 1000;
 		prevTime = time;
@@ -61,7 +64,7 @@ export const createSteveControls = (
 			// if (canJump) velocity.y += 50;
 			// canJump = false;
 			velocity.y += speed * delta;
-		};
+		}
 		if (pressedKeys["ShiftLeft"]) velocity.y -= speed * delta;
 		if (pressedKeys["KeyC"]) place();
 		if (pressedKeys["KeyV"]) remove();
@@ -122,47 +125,63 @@ export const createSteveControls = (
 		const collidesN = () => {
 			return false;
 			// https://stackoverflow.com/questions/11473755/how-to-detect-collision-in-three-js
-			for (let vertexIndex = 0; vertexIndex < playerBox.geometry.attributes.position.array.length; vertexIndex++) {
+			for (
+				let vertexIndex = 0;
+				vertexIndex <
+				playerBox.geometry.attributes.position.array.length;
+				vertexIndex++
+			) {
 				const localVertex = new Vector3()
-					.fromBufferAttribute(playerBox.geometry.attributes.position, vertexIndex)
+					.fromBufferAttribute(
+						playerBox.geometry.attributes.position,
+						vertexIndex
+					)
 					.clone();
 				const globalVertex = localVertex.applyMatrix4(playerBox.matrix);
 				const directionVector = globalVertex.sub(playerBox.position);
-	
-				const ray = new Raycaster(playerBox.position, directionVector.clone().normalize());
-				const collisionResults = ray.intersectObjects(world.worldGroup.children);
-				if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()) {
-					controls.getObject().position.sub(directionVector.multiply(0.5));
+
+				const ray = new Raycaster(
+					playerBox.position,
+					directionVector.clone().normalize()
+				);
+				const collisionResults = ray.intersectObjects(
+					world.worldGroup.children
+				);
+				if (
+					collisionResults.length > 0 &&
+					collisionResults[0].distance < directionVector.length()
+				) {
+					controls
+						.getObject()
+						.position.sub(directionVector.multiply(0.5));
 					return true;
 					// a collision occurred... do something...
 				}
 			}
-		}
+		};
 
-		controls.getObject().translateX(velocity.x * delta);
-		if (collides()) controls.getObject().translateX(-velocity.x * delta);
-		controls.getObject().translateZ(velocity.z * delta);
-		if (collides()) controls.getObject().translateZ(-velocity.z * delta);
+		// controls.getObject().translateX(velocity.x * delta);
+		// if (collides()) controls.getObject().translateX(-velocity.x * delta);
+		// controls.getObject().translateZ(velocity.z * delta);
+		// if (collides()) controls.getObject().translateZ(-velocity.z * delta);
 
 		// controls.getObject().position.y = height + (canMoveDown() ? velocity.y * delta : 0);
 
 		// controls.getObject().position.y = canMoveDown() ? height + velocity.y * delta : height;
-
 
 		// controls.getObject().translateX(direction.x);
 		// controls.getObject().position.z = direction.z;
 		// controls.getObject().position.z += direction.z;
 		// controls.getObject().position.add(direction.multiply(new Vector3(1,0,1)));
 
-
-
 		// if (direction.y >= 0.6 || direction.y <= -0.6) controls.getObject().translateZ(1);
 
-		if (velocity.y < 0) { // moving down
-			if (canMoveDown()) controls.getObject().position.y = height + velocity.y * delta;
+		if (velocity.y < 0) {
+			// moving down
+			if (canMoveDown())
+				controls.getObject().position.y = height + velocity.y * delta;
 			else controls.getObject().position.y = height;
-		}
-		else controls.getObject().position.y = height + (velocity.y * delta);
+		} else controls.getObject().position.y = height + velocity.y * delta;
 
 		// console.log('/////////////////');
 		// console.log('direction',direction.multiplyScalar(100).floor());
@@ -172,16 +191,45 @@ export const createSteveControls = (
 		// console.log(velocity);
 
 		/* It's adding a constant offset to the camera position. */
-		playerBox.position.copy(camera.position.clone().add(new Vector3(0, -0.7, 0)));
-
+		playerBox.position.copy(
+			camera.position.clone().add(new Vector3(0, -0.7, 0))
+		);
 
 		// if (!!velocity.y) controls.getObject().position.y = canMoveUp() ? height + velocity.y * delta : height;
 		// if (!velocity.y) controls.getObject().position.y = canMoveDown() ? height + velocity.y * delta : height;
 
-		const newChunkPos = new Vector2(Math.floor(camera.position.x / 32), Math.floor(camera.position.z / 32));
+		const newChunkPos = new Vector2(
+			Math.floor(camera.position.x / 16),
+			Math.floor(camera.position.z / 16)
+		);
 
-		if (!(newChunkPos.x == chunkPos.x && newChunkPos.y == chunkPos.y)) onChunkChange(chunkPos, newChunkPos);
+		if (!(newChunkPos.x == chunkPos.x && newChunkPos.y == chunkPos.y))
+			onChunkChange(chunkPos, newChunkPos);
 		chunkPos.copy(newChunkPos);
+	};
+
+	const update = () => {
+		const time = performance.now();
+		const delta = (time - prevTime) / 1000;
+		prevTime = time;
+
+		const v = new Vector3(0, 0, 0);
+
+		if (pressedKeys["KeyW"]) v.x += 10 * delta;
+		if (pressedKeys["KeyS"]) v.x -= 10 * delta;
+		if (pressedKeys["KeyD"]) v.z += 10 * delta;
+		if (pressedKeys["KeyA"]) v.z -= 10 * delta;
+		if (pressedKeys["Space"]) v.y += 10 * delta;
+		if (pressedKeys["ShiftLeft"]) v.y -= 10 * delta;
+
+		const x = controls.getObject().position.x;
+		const y = controls.getObject().position.y;
+		const z = controls.getObject().position.z;
+
+		// if (world.getBlock(x + v.x, y, z)) v.x *= -1;
+		controls.moveForward(v.x);
+		controls.moveRight(v.z);
+		controls.getObject().position.y += v.y;
 	};
 
 	return {

@@ -12,10 +12,15 @@ import { BoundingBoxHelper } from "three";
 
 export default function World(scene, renderDistance, seed) {
 	seed = seed ?? Math.random();
-	
+
 	this.chunks = [];
 	const generator = new WorldGenerator(seed);
-	const audioController = createAudioControler(['dirt','grass','stone','wood']);
+	const audioController = createAudioControler([
+		"dirt",
+		"grass",
+		"stone",
+		"wood",
+	]);
 	const worldGroup = new Group();
 	scene.add(worldGroup);
 	this.worldGroup = worldGroup;
@@ -40,8 +45,11 @@ export default function World(scene, renderDistance, seed) {
 			["planks", "oak_planks"],
 			["diamond", "diamond_ore"],
 			"cobblestone",
+			"sand",
+			"ice",
+			"water",
 		];
-		loadTextures(toLoad, loadedTextures => {
+		loadTextures(toLoad, (loadedTextures) => {
 			const { atlas, ranges } = mergeTextures(loadedTextures);
 			this.atlas = atlas;
 			this.ranges = ranges;
@@ -53,11 +61,16 @@ export default function World(scene, renderDistance, seed) {
 		});
 	};
 
-	const chunkExists = (x, y) => this.chunks.some(chunk => chunk.x == x && chunk.y == y);
+	const chunkExists = (x, y) =>
+		this.chunks.some((chunk) => chunk.x == x && chunk.y == y);
 
 	const render = (x, y, distance) => {
-		this.chunks.forEach(chunk => {
-			if (inRange(chunk.x, x - distance, x + distance) && inRange(chunk.y, y - distance, y + distance)) return;
+		this.chunks.forEach((chunk) => {
+			if (
+				inRange(chunk.x, x - distance, x + distance) &&
+				inRange(chunk.y, y - distance, y + distance)
+			)
+				return;
 			chunk.hide();
 		});
 		for (let i = x - distance; i < x + distance; i++) {
@@ -97,11 +110,15 @@ export default function World(scene, renderDistance, seed) {
 	 */
 	const generateChunk = (x, y) => {
 		if (chunkExists(x, y)) return;
-		const chunk = new Chunk(x, y, { atlas: this.atlas, ranges: this.ranges });
+		const chunk = new Chunk(x, y, {
+			atlas: this.atlas,
+			ranges: this.ranges,
+		});
 		this.chunks.push(chunk);
 	};
 
-	const getChunk = (x, y) => this.chunks.find(chunk => chunk.x == x && chunk.y == y);
+	const getChunk = (x, y) =>
+		this.chunks.find((chunk) => chunk.x == x && chunk.y == y);
 
 	const generateMeshChunk = (x, y, override = false) => {
 		const mainChunk = getChunk(x, y);
@@ -111,7 +128,7 @@ export default function World(scene, renderDistance, seed) {
 		const westChunk = getChunk(x - 1, y);
 
 		if (!mainChunk) throw new Error("Main Chunk not loaded!");
-		[northChunk, southChunk, eastChunk, westChunk].forEach(chunk => {
+		[northChunk, southChunk, eastChunk, westChunk].forEach((chunk) => {
 			if (!chunk) throw new Error("Chunk not loaded!");
 		});
 		mainChunk.setNeibours(northChunk, eastChunk, southChunk, westChunk);
@@ -119,41 +136,42 @@ export default function World(scene, renderDistance, seed) {
 	};
 
 	const setBlock = (x, y, z, block) => {
-		const chunkX = Math.floor(x / 32);
-		const chunkY = Math.floor(z / 32);
+		const chunkX = Math.floor(x / 16);
+		const chunkY = Math.floor(z / 16);
 		let chunk = getChunk(chunkX, chunkY);
 		if (!chunk) {
 			createChunk(chunkX, chunkY);
 			chunk = getChunk(chunkX, chunkY);
 		}
 
-		const playAudio = b => {
+		const playAudio = (b) => {
 			setTimeout(() => {
-				const path = {
-					dirt: 'dirt',
-					leaves: 'grass',
-					grass: 'grass',
-					diamond: 'stone',
-					stone: 'stone',
-					planks: 'wood',
-					log: 'wood'
-				}[b] || 'stone';
+				const path =
+					{
+						dirt: "dirt",
+						leaves: "grass",
+						grass: "grass",
+						diamond: "stone",
+						stone: "stone",
+						planks: "wood",
+						log: "wood",
+					}[b] || "stone";
 				audioController.play(path);
 			}, 0);
 		};
 
-		const oldBlock = chunk.getBlock(x - chunkX * 32, y, z - chunkY * 32);
-		if (chunk.setBlock(x - chunkX * 32, y, z - chunkY * 32, block)) {
+		const oldBlock = chunk.getBlock(x - chunkX * 16, y, z - chunkY * 16);
+		if (chunk.setBlock(x - chunkX * 16, y, z - chunkY * 16, block)) {
 			playAudio(oldBlock || block);
-			const _x = (x + 32) % 32;
-			const _z = (z + 32) % 32;
+			const _x = (x + 16) % 16;
+			const _z = (z + 16) % 16;
 			chunk.createMesh(true);
 
 			const neighbors = chunk.neighbors;
 			if (_x === 0) neighbors[3].createMesh(true);
 			if (_z === 0) neighbors[0].createMesh(true);
-			if (_x === 31) neighbors[1].createMesh(true);
-			if (_z === 31) neighbors[2].createMesh(true);
+			if (_x === 15) neighbors[1].createMesh(true);
+			if (_z === 15) neighbors[2].createMesh(true);
 		}
 	};
 	this.placeBlock = setBlock;
@@ -164,17 +182,18 @@ export default function World(scene, renderDistance, seed) {
 	this.removeBlock = removeBlock;
 
 	const getBlock = (x, y, z) => {
-		const chunkX = Math.floor(x / 32);
-		const chunkY = Math.floor(z / 32);
+		[x, y, z] = [x | 0, y | 0, z | 0];
+		const chunkX = Math.floor(x / 16);
+		const chunkY = Math.floor(z / 16);
 		let chunk = getChunk(chunkX, chunkY);
 		if (chunk) {
-			return chunk.getBlock((32 + x) % 32, y, (32 + z) % 32);
+			return chunk.getBlock((16 + x) % 16, y, (16 + z) % 16);
 		}
 	};
 	this.getBlock = getBlock;
 
 	const Chunk = function (x, y, { atlas, ranges }) {
-		const size = 32;
+		const size = 16;
 		const voxels = generator.generate(x * size, y * size, size, size);
 
 		this.voxels = voxels;
@@ -183,10 +202,13 @@ export default function World(scene, renderDistance, seed) {
 		this.setNeibours = (northChunk, eastChunk, southChunk, westChunk) =>
 			(this.neighbors = [northChunk, eastChunk, southChunk, westChunk]);
 
-		this.createMesh = override => {
+		this.createMesh = (override) => {
 			if (this.mesh && !override) return (this.mesh.visible = true);
 			if (this.mesh) worldGroup.remove(this.mesh);
-			const voxels = [this.voxels, ...this.neighbors.map(v => v.voxels)];
+			const voxels = [
+				this.voxels,
+				...this.neighbors.map((v) => v.voxels),
+			];
 			const mesh = createChunkMesh(...voxels, [self.atlas, self.ranges]);
 			mesh.position.set(x * size, 0, y * size);
 			worldGroup.add(mesh);
@@ -195,7 +217,8 @@ export default function World(scene, renderDistance, seed) {
 		};
 
 		this.setBlock = (x, y, z, value = "stone") => {
-			if ([value, "bedrock"].includes(this.voxels.getCell(x, y, z))) return false;
+			if ([value, "bedrock"].includes(this.voxels.getCell(x, y, z)))
+				return false;
 			this.voxels.setCell(x, y, z, value);
 			return true;
 		};

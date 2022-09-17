@@ -23,28 +23,40 @@ const blockTexture = (name, callback = () => {}) => {
  * @param [onload] - A function that will be called when all the textures have been loaded.
  */
 export const loadTextures = (
-	textures = ["dirt", "stone", ["beans", "raw_iron_block"], "bedrock", ["all", "atlas"]],
+	textures = [
+		"dirt",
+		"stone",
+		["beans", "raw_iron_block"],
+		"bedrock",
+		["all", "atlas"],
+	],
 	onload = () => {}
 ) => {
 	const loadedTextures = {};
 	let leftToLoad = textures.length;
 	for (const textureName of textures) {
-		const [key, name] = typeof textureName == "string" ? [textureName] : textureName;
-		loader.load(`block/${name || key}.png`,(texture) => {
-			texture.magFilter = NearestFilter;
-			texture.minFilter = LinearFilter;
-			loadedTextures[key] = texture;
-			leftToLoad--;
-			if (!leftToLoad) return onload(loadedTextures);
-		},undefined,() => {
-			leftToLoad--;
-			console.error(`Texture ${textureName} does not exist!`);
-		})
+		const [key, name] =
+			typeof textureName == "string" ? [textureName] : textureName;
+		loader.load(
+			`block/${name || key}.png`,
+			(texture) => {
+				texture.magFilter = NearestFilter;
+				texture.minFilter = LinearFilter;
+				loadedTextures[key] = texture;
+				leftToLoad--;
+				if (!leftToLoad) return onload(loadedTextures);
+			},
+			undefined,
+			() => {
+				leftToLoad--;
+				console.error(`Texture ${textureName} does not exist!`);
+			}
+		);
 	}
 };
 
 export const loadImage = (imgName, onLoad = () => {}) => {
 	loader.load(imgName, onLoad);
-}
+};
 
 // export const loadedTextures = loadTextures("dirt", "stone", ["beans", "raw_iron_block"], "bedrock", ["all", "atlas"]);
